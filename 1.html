@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -114,6 +115,7 @@
         }
     </style>
 </head>
+
 <body>
     <div id="qrcode"></div>
 
@@ -161,11 +163,12 @@
             <button type="button" onclick="generateQRCode()">提交</button>
         </form>
     </div>
-    
+
     <script src="qrcode.min.js"></script>
     <script>
+
+
         function generateQRCode() {
-            // 获取表单值
             const typeCode = document.getElementById('typeCode').value;
             const invoiceType = document.getElementById('invoiceType').value;
             const serialNumber = document.getElementById('serialNumber').value;
@@ -175,34 +178,32 @@
             let issueDate = document.getElementById('issueDate').value;
             const checkCode = document.getElementById('checkCode').value;
 
-            // 格式化日期
             if (issueDate) {
                 issueDate = issueDate.replace(/-/g, '');
             }
 
-            // 创建二维码数据字符串
             const qrData = `${typeCode},${invoiceType},${invoiceCode},${invoiceNumber},${totalAmount},${issueDate},${checkCode},${serialNumber}`;
 
-            // 生成二维码
             const qrcodeDiv = document.getElementById('qrcode');
-            qrcodeDiv.innerHTML = ''; // 清空之前的内容
-            QRCode.toCanvas(qrData, {
+            qrcodeDiv.innerHTML = ''; // Clear previous content
+            qrcodeDiv.style.display = 'block';
+
+            // Use the constructor API
+            new QRCode(qrcodeDiv, {
+                text: qrData,
                 width: 300,
-                margin: 2,
-                color: {
-                    dark: '#1a3c34',
-                    light: '#ffffff'
-                }
-            }, function (error, canvas) {
-                if (error) console.error(error);
-                qrcodeDiv.appendChild(canvas);
-                
-                // 显示二维码并隐藏表单
-                qrcodeDiv.style.display = 'block';
-                const formContainer = document.getElementById('form');
-                formContainer.classList.add('hidden');
+                height: 300,
+                colorDark: '#1a3c34',
+                colorLight: '#ffffff',
+                correctLevel: QRCode.CorrectLevel.H
             });
+
+            const formContainer = document.getElementById('form');
+            formContainer.classList.add('hidden');
         }
+
+
     </script>
 </body>
+
 </html>
