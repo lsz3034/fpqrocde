@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>发票信息输入</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Arial, sans-serif;
+            background-color: #f5f7fa;
+            margin: 0;
+            padding: 20px;
+            min-height: 100vh;
+        }
+
+        .form-container {
+            max-width: 600px;
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            transition: opacity 0.3s ease;
+            margin: 0 auto;
+        }
+
+        .form-container.hidden {
+            opacity: 0;
+            height: 0;
+            padding: 0;
+            overflow: hidden;
+        }
+
+        h2 {
+            text-align: center;
+            color: #333;
+            margin-bottom: 30px;
+        }
+
+        .form-row {
+            display: flex;
+            justify-content: space-between;
+            gap: 20px;
+        }
+
+        .form-column {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            color: #555;
+            font-weight: 500;
+        }
+
+        input {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            box-sizing: border-box;
+            font-size: 14px;
+            transition: border-color 0.3s;
+        }
+
+        input:focus {
+            outline: none;
+            border-color: #4CAF50;
+            box-shadow: 0 0 5px rgba(76, 175, 80, 0.3);
+        }
+
+        button {
+            width: 100%;
+            padding: 12px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        button:hover {
+            background-color: #45a049;
+        }
+
+        button:active {
+            background-color: #3d8b40;
+        }
+
+        #qrcode {
+            text-align: center;
+            padding: 20px;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            display: none;
+            transition: all 0.3s ease;
+            margin: 20px auto;
+            max-width: 600px;
+        }
+
+        #qrcode canvas {
+            padding: 15px;
+            border: 2px dashed #4CAF50;
+            border-radius: 8px;
+            background: linear-gradient(45deg, #f0f9ff, #f9fff0);
+        }
+    </style>
+</head>
+<body>
+    <div id="qrcode"></div>
+
+    <div id="form" class="form-container">
+        <h2>发票信息录入</h2>
+        <form id="invoiceForm">
+            <div class="form-row">
+                <div class="form-column">
+                    <div class="form-group">
+                        <label for="typeCode">类型代码:</label>
+                        <input type="text" id="typeCode" name="typeCode" value="01">
+                    </div>
+                    <div class="form-group">
+                        <label for="invoiceType">发票种类:</label>
+                        <input type="text" id="invoiceType" name="invoiceType" value="10">
+                    </div>
+                    <div class="form-group">
+                        <label for="serialNumber">流水号:</label>
+                        <input type="text" id="serialNumber" name="serialNumber" value="1965">
+                    </div>
+                    <div class="form-group">
+                        <label for="invoiceCode">发票代码:</label>
+                        <input type="text" id="invoiceCode" name="invoiceCode" value="031002200411">
+                    </div>
+                </div>
+                <div class="form-column">
+                    <div class="form-group">
+                        <label for="invoiceNumber">发票号码:</label>
+                        <input type="text" id="invoiceNumber" name="invoiceNumber" value="69907069">
+                    </div>
+                    <div class="form-group">
+                        <label for="totalAmount">合计金额:</label>
+                        <input type="number" id="totalAmount" name="totalAmount" step="0.01" value="12345.67">
+                    </div>
+                    <div class="form-group">
+                        <label for="issueDate">开票日期:</label>
+                        <input type="date" id="issueDate" name="issueDate" value="2023-07-01">
+                    </div>
+                    <div class="form-group">
+                        <label for="checkCode">发票校验码:</label>
+                        <input type="text" id="checkCode" name="checkCode" value="13550690759446699496">
+                    </div>
+                </div>
+            </div>
+            <button type="button" onclick="generateQRCode()">提交</button>
+        </form>
+    </div>
+    
+    <script src="qrcode.min.js"></script>
+    <script>
+        function generateQRCode() {
+            // 获取表单值
+            const typeCode = document.getElementById('typeCode').value;
+            const invoiceType = document.getElementById('invoiceType').value;
+            const serialNumber = document.getElementById('serialNumber').value;
+            const invoiceCode = document.getElementById('invoiceCode').value;
+            const invoiceNumber = document.getElementById('invoiceNumber').value;
+            const totalAmount = document.getElementById('totalAmount').value;
+            let issueDate = document.getElementById('issueDate').value;
+            const checkCode = document.getElementById('checkCode').value;
+
+            // 格式化日期
+            if (issueDate) {
+                issueDate = issueDate.replace(/-/g, '');
+            }
+
+            // 创建二维码数据字符串
+            const qrData = `${typeCode},${invoiceType},${invoiceCode},${invoiceNumber},${totalAmount},${issueDate},${checkCode},${serialNumber}`;
+
+            // 生成二维码
+            const qrcodeDiv = document.getElementById('qrcode');
+            qrcodeDiv.innerHTML = ''; // 清空之前的内容
+            QRCode.toCanvas(qrData, {
+                width: 300,
+                margin: 2,
+                color: {
+                    dark: '#1a3c34',
+                    light: '#ffffff'
+                }
+            }, function (error, canvas) {
+                if (error) console.error(error);
+                qrcodeDiv.appendChild(canvas);
+                
+                // 显示二维码并隐藏表单
+                qrcodeDiv.style.display = 'block';
+                const formContainer = document.getElementById('form');
+                formContainer.classList.add('hidden');
+            });
+        }
+    </script>
+</body>
+</html>
